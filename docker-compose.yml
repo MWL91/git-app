@@ -1,0 +1,22 @@
+version: '3.5'
+services:
+  nginx:
+    container_name: git_nginx
+    image: nginx:latest
+    ports:
+      - "6666:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/conf/:/etc/nginx/conf.d/
+      - ./docker/www_logs/nginx:/var/log/nginx
+    links:
+      - phpfpm
+  phpfpm:
+    ports:
+      - "6665:6001"
+    container_name: git_app
+    build: docker/containers/php73-fpm
+    command: bash -c "/etc/init.d/cron start && php-fpm -F"
+    volumes:
+      - ./:/var/www/html:cached
+      - ./docker/php-custom.ini:/usr/local/etc/php/conf.d/php-custom.ini
